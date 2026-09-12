@@ -1,0 +1,2970 @@
+<!DOCTYPE html>
+<html lang="om">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Aanni Online Lottery - Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(
+    135deg,
+    #061b2b,
+    #123f5c,
+    #071d30
+  );
+  color:white;
+  min-height:100vh;
+  padding:20px 12px 50px;
+}
+
+h1{
+  text-align:center;
+  margin:10px 0 5px;
+  font-size:28px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#b9d8e8;
+  margin-bottom:20px;
+}
+
+#message{
+  text-align:center;
+  margin:15px auto;
+  font-weight:bold;
+}
+
+.top-buttons{
+  max-width:600px;
+  margin:auto;
+}
+
+.top-buttons button{
+  width:100%;
+  border:0;
+  border-radius:12px;
+  padding:14px;
+  margin:6px 0;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.refresh{
+  background:#1976d2;
+  color:white;
+}
+
+.draw{
+  background:#ff9800;
+  color:white;
+}
+
+.round-box{
+  max-width:600px;
+  margin:20px auto;
+  background:white;
+  color:#111;
+  border-radius:20px;
+  padding:18px;
+  box-shadow:0 10px 30px #0008;
+  text-align:center;
+}
+
+.round-title{
+  font-size:20px;
+  font-weight:bold;
+  color:#123f5c;
+}
+
+.round-count{
+  font-size:30px;
+  font-weight:bold;
+  margin:10px 0;
+}
+
+.receipt-tools{
+  max-width:600px;
+  margin:15px auto;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.receipt-tools button{
+  flex:1;
+  min-width:130px;
+  border:0;
+  border-radius:12px;
+  padding:13px 10px;
+  font-size:14px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.select-all{
+  background:#1976d2;
+  color:white;
+}
+
+.deselect-all{
+  background:#607d8b;
+  color:white;
+}
+
+.delete-selected{
+  background:#d32f2f;
+  color:white;
+}
+
+.receipts{
+  max-width:600px;
+  margin:auto;
+}
+
+.card{
+  background:white;
+  color:#111;
+  border-radius:20px;
+  padding:16px;
+  margin:18px 0;
+  box-shadow:0 10px 30px #0008;
+}
+
+.select-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#f1f5f9;
+  padding:10px 12px;
+  border-radius:12px;
+  margin-bottom:12px;
+}
+
+.select-row input{
+  width:21px;
+  height:21px;
+  cursor:pointer;
+}
+
+.select-row label{
+  font-weight:bold;
+  color:#123f5c;
+  cursor:pointer;
+}
+
+.info{
+  line-height:1.7;
+  font-size:16px;
+}
+
+.info b{
+  color:#123f5c;
+}
+
+.ticket-list{
+  font-size:20px;
+  font-weight:bold;
+  color:#1769ff;
+  margin:5px 0 8px;
+}
+
+.receipt-image{
+  width:100%;
+  max-height:600px;
+  object-fit:contain;
+  border-radius:14px;
+  margin-top:12px;
+  background:#eee;
+  display:block;
+  cursor:pointer;
+}
+
+.status{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:20px;
+  font-weight:bold;
+  margin-top:8px;
+}
+
+.pending{
+  background:#fff3cd;
+  color:#856404;
+}
+
+.approved{
+  background:#d4edda;
+  color:#155724;
+}
+
+.rejected{
+  background:#f8d7da;
+  color:#721c24;
+}
+
+.buttons{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+  flex-wrap:wrap;
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:12px 18px;
+  font-size:15px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.buttons button{
+  flex:1;
+  min-width:120px;
+}
+
+.approve{
+  background:#00c853;
+  color:white;
+}
+
+.reject{
+  background:#e53935;
+  color:white;
+}
+
+.delete{
+  background:#8e24aa;
+  color:white;
+}
+
+button:active{
+  transform:scale(.97);
+}
+
+.empty{
+  text-align:center;
+  padding:40px 10px;
+  color:#c7dce8;
+}
+
+.loading{
+  text-align:center;
+  padding:30px;
+}
+
+.time{
+  font-size:13px;
+  color:#666;
+  margin-top:8px;
+}
+
+.winner-box{
+  max-width:600px;
+  margin:20px auto;
+  background:linear-gradient(
+    135deg,
+    #fff8e1,
+    #ffe082
+  );
+  color:#111;
+  border-radius:20px;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 10px 30px #0008;
+}
+
+.winner-box h2{
+  margin:0 0 15px;
+  color:#e65100;
+}
+
+.winner-row{
+  background:#ffffffaa;
+  padding:12px;
+  border-radius:12px;
+  margin:8px 0;
+  font-size:17px;
+  font-weight:bold;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<h1>🎟️ Aanni Online Lottery</h1>
+
+<div class="subtitle">
+Admin Panel
+</div>
+
+
+<div class="top-buttons">
+
+<button
+class="refresh"
+onclick="loadReceipts()">
+
+🔄 Refresh
+
+</button>
+
+
+<button
+class="draw"
+onclick="finishRound()">
+
+🏆 Draw Winner
+
+</button>
+
+</div>
+
+
+<div
+id="roundBox"
+class="round-box">
+
+<div class="round-title">
+⏳ Round Loading...
+</div>
+
+<div class="round-count">
+...
+</div>
+
+</div>
+
+
+<div
+id="winnerBox"
+class="winner-box"
+style="display:none;">
+</div>
+
+
+<div
+class="receipt-tools">
+
+<button
+class="select-all"
+onclick="selectAllReceipts()">
+
+☑️ Select All
+
+</button>
+
+
+<button
+class="deselect-all"
+onclick="deselectAllReceipts()">
+
+⬜ Deselect All
+
+</button>
+
+
+<button
+class="delete-selected"
+onclick="deleteSelectedReceipts()">
+
+🗑️ Delete Selected
+
+</button>
+
+</div>
+
+
+<div id="message"></div>
+
+
+<div
+id="receipts"
+class="receipts">
+
+<div class="loading">
+⏳ Receiptwwan barbaadaa jira...
+</div>
+
+</div>
+
+
+
+<script>
+
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+"https://iwoplidjsadmgavegwws.supabase.co";
+
+
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3b3BsaWRqc2FkbWdhdmVnd3dzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNjQ2ODQsImV4cCI6MjEwMzk0MDY4NH0.Z8hfxoz6jSVikzm94g7ihpTn5HlPUqRFLPJcr2HS7RE"
+
+
+const supabaseClient =
+supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+
+/* =====================================================
+   GET ACTIVE ROUND
+===================================================== */
+
+async function getActiveRound(){
+
+  const {
+    data:round,
+    error
+  } =
+  await supabaseClient
+  .from("rounds")
+  .select("*")
+  .eq(
+    "status",
+    "active"
+  )
+  .order(
+    "created_at",
+    {
+      ascending:false
+    }
+  )
+  .limit(1)
+  .maybeSingle();
+
+
+  if(error){
+
+    console.log(
+      "Active round error:",
+      error.message
+    );
+
+    return null;
+
+  }
+
+
+  return round || null;
+
+}
+
+
+
+/* =====================================================
+   LOAD ACTIVE ROUND
+===================================================== */
+
+async function loadActiveRound(){
+
+  const roundBox =
+    document.getElementById(
+      "roundBox"
+    );
+
+
+  const round =
+    await getActiveRound();
+
+
+  if(!round){
+
+    roundBox.innerHTML = `
+
+      <div class="round-title">
+        ❌ Active round hin jiru
+      </div>
+
+    `;
+
+    return null;
+
+  }
+
+
+  const {
+    count,
+    error:countError
+  } =
+  await supabaseClient
+  .from("numbers")
+  .select(
+    "*",
+    {
+      count:"exact",
+      head:true
+    }
+  )
+  .eq(
+    "status",
+    "confirmed"
+  )
+  .eq(
+    "round_id",
+    round.id
+  );
+
+
+  if(countError){
+
+    console.log(
+      countError
+    );
+
+    return round;
+
+  }
+
+
+  roundBox.innerHTML = `
+
+    <div class="round-title">
+
+      🏆 Round
+      ${escapeHTML(
+        round.round_number
+      )}
+
+    </div>
+
+
+    <div class="round-count">
+
+      ${count || 0} / 100
+
+    </div>
+
+
+    <div>
+
+      ${
+        count === 100
+        ?
+        "✅ Number 100 guutameera. Draw gochuu dandeessa."
+        :
+        "⏳ Number 100 guutamuu qaba."
+      }
+
+    </div>
+
+  `;
+
+
+  return round;
+
+}
+
+
+
+/* =====================================================
+   GET TICKET LIST
+===================================================== */
+
+function getTicketList(receipt){
+
+  if(
+    receipt &&
+    receipt.ticket_numbers &&
+    String(
+      receipt.ticket_numbers
+    ).trim()
+  ){
+
+    return String(
+      receipt.ticket_numbers
+    )
+    .split(",")
+    .map(
+      x =>
+        Number(
+          x.trim()
+        )
+    )
+    .filter(
+      x =>
+        Number.isInteger(x) &&
+        x >= 1 &&
+        x <= 100
+    );
+
+  }
+
+
+  if(
+    receipt &&
+    receipt.number !== null &&
+    receipt.number !== undefined
+  ){
+
+    const n =
+      Number(
+        receipt.number
+      );
+
+
+    if(
+      Number.isInteger(n) &&
+      n >= 1 &&
+      n <= 100
+    ){
+
+      return [n];
+
+    }
+
+  }
+
+
+  return [];
+
+}
+
+
+
+/* =====================================================
+   SELECT ALL
+===================================================== */
+
+function selectAllReceipts(){
+
+  const boxes =
+    document.querySelectorAll(
+      ".receipt-select"
+    );
+
+
+  boxes.forEach(
+    box => {
+
+      box.checked = true;
+
+    }
+  );
+
+}
+
+
+
+/* =====================================================
+   DESELECT ALL
+===================================================== */
+
+function deselectAllReceipts(){
+
+  const boxes =
+    document.querySelectorAll(
+      ".receipt-select"
+    );
+
+
+  boxes.forEach(
+    box => {
+
+      box.checked = false;
+
+    }
+  );
+
+}
+
+
+
+/* =====================================================
+   LOAD RECEIPTS
+===================================================== */
+
+async function loadReceipts(){
+
+  const box =
+    document.getElementById(
+      "receipts"
+    );
+
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+
+  box.innerHTML = `
+
+    <div class="loading">
+      ⏳ Receiptwwan barbaadaa jira...
+    </div>
+
+  `;
+
+
+  message.innerHTML = "";
+
+
+  await releaseExpiredNumbers();
+
+
+  await loadActiveRound();
+
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+  .from("receipts")
+  .select("*")
+  .order(
+    "created_at",
+    {
+      ascending:false
+    }
+  );
+
+
+  if(error){
+
+    console.log(
+      error
+    );
+
+
+    box.innerHTML = `
+
+      <div class="empty">
+
+        ❌ Receiptwwan fiduu hin dandeenye.
+
+      </div>
+
+    `;
+
+
+    message.innerHTML =
+      "Database error: " +
+      escapeHTML(
+        error.message
+      );
+
+
+    return;
+
+  }
+
+
+  if(
+    !data ||
+    data.length === 0
+  ){
+
+    box.innerHTML = `
+
+      <div class="empty">
+
+        📭 Receipt hin jiru.
+
+      </div>
+
+    `;
+
+
+    return;
+
+  }
+
+
+  box.innerHTML = "";
+
+
+  data.forEach(
+    receipt => {
+
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "card";
+
+
+      /* IMAGE */
+
+      let imageUrl =
+        receipt.image_url || "";
+
+
+      if(
+        imageUrl &&
+        !imageUrl.startsWith(
+          "http"
+        )
+      ){
+
+        const {
+          data:urlData
+        } =
+        supabaseClient
+        .storage
+        .from("receipts")
+        .getPublicUrl(
+          imageUrl
+        );
+
+
+        if(urlData){
+
+          imageUrl =
+            urlData.publicUrl;
+
+        }
+
+      }
+
+
+      /* STATUS */
+
+      const status =
+        receipt.status ||
+        "pending";
+
+
+      let statusClass =
+        "pending";
+
+
+      if(
+        status === "approved"
+      ){
+
+        statusClass =
+          "approved";
+
+      }
+
+
+      if(
+        status === "rejected"
+      ){
+
+        statusClass =
+          "rejected";
+
+      }
+
+
+      /* DATE */
+
+      let createdText =
+        "";
+
+
+      if(
+        receipt.created_at
+      ){
+
+        try{
+
+          createdText =
+            new Date(
+              receipt.created_at
+            ).toLocaleString();
+
+        }catch(e){
+
+          createdText =
+            receipt.created_at;
+
+        }
+
+      }
+
+
+      /* TICKETS */
+
+      const ticketList =
+        getTicketList(
+          receipt
+        );
+
+
+      const ticketText =
+        ticketList.length > 0
+        ?
+        ticketList.join(", ")
+        :
+        "-";
+
+
+      /* IMAGE HTML */
+
+      let imageHTML =
+        "";
+
+
+      if(imageUrl){
+
+        imageHTML = `
+
+          <img
+            class="receipt-image"
+            src="${escapeHTML(
+              imageUrl
+            )}"
+            alt="Receipt"
+
+            onclick="
+              window.open(
+                this.src,
+                '_blank'
+              )
+            "
+
+          >
+
+        `;
+
+      }else{
+
+        imageHTML = `
+
+          <div
+            style="
+              background:#eee;
+              padding:30px;
+              text-align:center;
+              border-radius:12px;
+              margin-top:12px;
+            "
+          >
+
+            📷 Receipt image hin jiru
+
+          </div>
+
+        `;
+
+      }
+
+
+      /* BUTTONS */
+
+      let buttonsHTML =
+        "";
+
+
+      if(
+        status === "pending"
+      ){
+
+        buttonsHTML = `
+
+          <div class="buttons">
+
+            <button
+              class="approve"
+              onclick="approve(
+                ${receipt.id}
+              )"
+            >
+
+              ✅ Approve
+
+            </button>
+
+
+            <button
+              class="reject"
+              onclick="rejectReceipt(
+                ${receipt.id}
+              )"
+            >
+
+              ❌ Reject
+
+            </button>
+
+
+            <button
+              class="delete"
+              onclick="deleteReceipt(
+                ${receipt.id},
+                '${escapeJS(
+                  receipt.image_url || ""
+                )}'
+              )"
+            >
+
+              🗑️ Delete
+
+            </button>
+
+          </div>
+
+        `;
+
+      }else{
+
+        buttonsHTML = `
+
+          <div class="buttons">
+
+            <button
+              class="delete"
+              onclick="deleteReceipt(
+                ${receipt.id},
+                '${escapeJS(
+                  receipt.image_url || ""
+                )}'
+              )"
+            >
+
+              🗑️ Delete
+
+            </button>
+
+          </div>
+
+        `;
+
+      }
+
+
+      /* CARD */
+
+      card.innerHTML = `
+
+        <div class="select-row">
+
+          <input
+            type="checkbox"
+            class="receipt-select"
+            value="${receipt.id}"
+            id="receipt-${receipt.id}"
+          >
+
+          <label
+            for="receipt-${receipt.id}"
+          >
+
+            ☑️ Select Receipt
+
+          </label>
+
+        </div>
+
+
+        <div class="info">
+
+          <div class="ticket-list">
+
+            🎟 Ticket:
+            ${escapeHTML(
+              ticketText
+            )}
+
+          </div>
+
+
+          <div>
+
+            <b>👤 Maqaa:</b>
+
+            ${escapeHTML(
+              receipt.user_name ??
+              "-"
+            )}
+
+          </div>
+
+
+          <div>
+
+            <b>📱 Phone:</b>
+
+            ${escapeHTML(
+              receipt.phone ??
+              "-"
+            )}
+
+          </div>
+
+
+          <div>
+
+            <b>Status:</b>
+
+            <span
+              class="status ${statusClass}"
+            >
+
+              ${escapeHTML(
+                status
+              )}
+
+            </span>
+
+          </div>
+
+
+          ${
+            createdText
+            ?
+            `
+              <div class="time">
+
+                🕒
+                ${escapeHTML(
+                  createdText
+                )}
+
+              </div>
+            `
+            :
+            ""
+          }
+
+        </div>
+
+
+        ${imageHTML}
+
+
+        ${buttonsHTML}
+
+      `;
+
+
+      box.appendChild(
+        card
+      );
+
+    }
+  );
+
+}
+
+
+
+/* =====================================================
+   APPROVE RECEIPT
+===================================================== */
+
+async function approve(id){
+
+  const ok =
+    confirm(
+      "Receipt kana approve gochuu barbaaddaa?"
+    );
+
+
+  if(!ok) return;
+
+
+  const activeRound =
+    await getActiveRound();
+
+
+  if(!activeRound){
+
+    alert(
+      "❌ Active round hin jiru."
+    );
+
+    return;
+
+  }
+
+
+  const {
+    data:receipt,
+    error:receiptError
+  } =
+  await supabaseClient
+  .from("receipts")
+  .select(
+    "id,user_name,phone,number,ticket_numbers,status"
+  )
+  .eq(
+    "id",
+    id
+  )
+  .maybeSingle();
+
+
+  if(
+    receiptError ||
+    !receipt
+  ){
+
+    alert(
+      "❌ Receipt argachuu hin dandeenye.\n\n" +
+      (
+        receiptError?.message ||
+        ""
+      )
+    );
+
+    return;
+
+  }
+
+
+  if(
+    receipt.status !==
+    "pending"
+  ){
+
+    alert(
+      "⚠️ Receipt kun duraan " +
+      receipt.status +
+      " dha."
+    );
+
+    return;
+
+  }
+
+
+  const ownerName =
+    receipt.user_name
+    ?
+    String(
+      receipt.user_name
+    ).trim()
+    :
+    "";
+
+
+  if(!ownerName){
+
+    alert(
+      "❌ Maqaan namaa hin jiru."
+    );
+
+    return;
+
+  }
+
+
+  const ticketList =
+    getTicketList(
+      receipt
+    );
+
+
+  if(
+    ticketList.length === 0
+  ){
+
+    alert(
+      "❌ Ticket number hin argamne."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    ticketList.length > 5
+  ){
+
+    alert(
+      "❌ Ticket 5 ol hin hayyamamu."
+    );
+
+    return;
+
+  }
+
+
+  const {
+    data:numbers,
+    error:numberFetchError
+  } =
+  await supabaseClient
+  .from("numbers")
+  .select(
+    "number,status,round_id"
+  )
+  .in(
+    "number",
+    ticketList
+  );
+
+
+  if(numberFetchError){
+
+    alert(
+      "❌ Numbers fiduu hin dandeenye.\n\n" +
+      numberFetchError.message
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !numbers ||
+    numbers.length !==
+    ticketList.length
+  ){
+
+    alert(
+      "❌ Ticket number tokko tokko hin argamne."
+    );
+
+    return;
+
+  }
+
+
+  for(
+    const ticket of ticketList
+  ){
+
+    const row =
+      numbers.find(
+        n =>
+          Number(
+            n.number
+          ) === ticket
+      );
+
+
+    if(!row){
+
+      alert(
+        "❌ Number " +
+        ticket +
+        " hin argamne."
+      );
+
+      return;
+
+    }
+
+
+    if(
+      String(
+        row.round_id
+      ) !==
+      String(
+        activeRound.id
+      )
+    ){
+
+      alert(
+        "❌ Number " +
+        ticket +
+        " Round " +
+        activeRound.round_number +
+        " keessa miti."
+      );
+
+      return;
+
+    }
+
+
+    if(
+      row.status !==
+      "pending"
+    ){
+
+      alert(
+        "❌ Number " +
+        ticket +
+        " pending miti.\n\n" +
+        "Status: " +
+        row.status
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  /* APPROVE RECEIPT */
+
+  const {
+    error:approveError
+  } =
+  await supabaseClient
+  .from("receipts")
+  .update({
+    status:"approved"
+  })
+  .eq(
+    "id",
+    id
+  );
+
+
+  if(approveError){
+
+    alert(
+      "❌ Receipt approve hin taane.\n\n" +
+      approveError.message
+    );
+
+    return;
+
+  }
+
+
+  /* UPDATE NUMBERS */
+
+  let updateError =
+    null;
+
+
+  for(
+    const ticket of ticketList
+  ){
+
+    const {
+      error
+    } =
+    await supabaseClient
+    .from("numbers")
+    .update({
+
+      status:
+        "confirmed",
+
+      pending_until:
+        null,
+
+      round_id:
+        activeRound.id,
+
+      owner_name:
+        ownerName
+
+    })
+    .eq(
+      "number",
+      ticket
+    )
+    .eq(
+      "round_id",
+      activeRound.id
+    );
+
+
+    if(error){
+
+      updateError =
+        error;
+
+      break;
+
+    }
+
+  }
+
+
+  if(updateError){
+
+    alert(
+      "⚠️ Receipt approved ta'eera, garuu number update hin taane.\n\n" +
+      updateError.message
+    );
+
+    console.log(
+      updateError
+    );
+
+    return;
+
+  }
+
+
+  alert(
+    "✅ Receipt Approved!\n\n" +
+
+    "🎟 Ticket: " +
+    ticketList.join(", ") +
+
+    "\n👤 Maqaa: " +
+    ownerName +
+
+    "\n\nNumber hundi confirmed ta'eera."
+  );
+
+
+  await loadReceipts();
+
+}
+
+
+
+/* =====================================================
+   REJECT RECEIPT
+===================================================== */
+
+async function rejectReceipt(id){
+
+  const ok =
+    confirm(
+      "Receipt kana reject gochuu barbaaddaa?"
+    );
+
+
+  if(!ok) return;
+
+
+  const {
+    data:receipt,
+    error:receiptFetchError
+  } =
+  await supabaseClient
+  .from("receipts")
+  .select(
+    "id,number,ticket_numbers,status"
+  )
+  .eq(
+    "id",
+    id
+  )
+  .maybeSingle();
+
+
+  if(
+    receiptFetchError ||
+    !receipt
+  ){
+
+    alert(
+      "❌ Receipt argachuu hin dandeenye."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    receipt.status !==
+    "pending"
+  ){
+
+    alert(
+      "⚠️ Receipt kun duraan " +
+      receipt.status +
+      " dha."
+    );
+
+    return;
+
+  }
+
+
+  const ticketList =
+    getTicketList(
+      receipt
+    );
+
+
+  if(
+    ticketList.length === 0
+  ){
+
+    alert(
+      "❌ Ticket number hin argamne."
+    );
+
+    return;
+
+  }
+
+
+  const {
+    error:receiptError
+  } =
+  await supabaseClient
+  .from("receipts")
+  .update({
+    status:
+      "rejected"
+  })
+  .eq(
+    "id",
+    id
+  );
+
+
+  if(receiptError){
+
+    alert(
+      "❌ Receipt reject hin taane.\n\n" +
+      receiptError.message
+    );
+
+    return;
+
+  }
+
+
+  for(
+    const ticket of ticketList
+  ){
+
+    const {
+      error
+    } =
+    await supabaseClient
+    .from("numbers")
+    .update({
+
+      status:
+        "available",
+
+      pending_until:
+        null
+
+    })
+    .eq(
+      "number",
+      ticket
+    )
+    .eq(
+      "status",
+      "pending"
+    );
+
+
+    if(error){
+
+      console.log(
+        "Reject release error:",
+        ticket,
+        error.message
+      );
+
+    }
+
+  }
+
+
+  alert(
+    "❌ Receipt rejected.\n\n" +
+
+    "🎟 Ticket: " +
+    ticketList.join(", ") +
+
+    "\n\nAvailable deebi'eera."
+  );
+
+
+  await loadReceipts();
+
+}
+
+
+
+/* =====================================================
+   DELETE ONE RECEIPT
+===================================================== */
+
+async function deleteReceipt(
+  id,
+  image
+){
+
+  const ok =
+    confirm(
+      "🗑️ Receipt kana haquu akka barbaaddu mirkaneessi?"
+    );
+
+
+  if(!ok) return;
+
+
+  const {
+    data:receipt,
+    error:receiptFetchError
+  } =
+  await supabaseClient
+  .from("receipts")
+  .select(
+    "id,number,ticket_numbers,status,image_url"
+  )
+  .eq(
+    "id",
+    id
+  )
+  .maybeSingle();
+
+
+  if(
+    receiptFetchError
+  ){
+
+    alert(
+      "❌ Receipt argachuu hin dandeenye.\n\n" +
+      receiptFetchError.message
+    );
+
+    return;
+
+  }
+
+
+  if(!receipt){
+
+    alert(
+      "❌ Receipt hin argamne."
+    );
+
+    return;
+
+  }
+
+
+  const ticketList =
+    getTicketList(
+      receipt
+    );
+
+
+  /* DELETE DB RECEIPT */
+
+  const {
+    error:deleteError
+  } =
+  await supabaseClient
+  .from("receipts")
+  .delete()
+  .eq(
+    "id",
+    id
+  );
+
+
+  if(deleteError){
+
+    alert(
+      "❌ Receipt haquu hin dandeenye.\n\n" +
+      deleteError.message
+    );
+
+    console.log(
+      deleteError
+    );
+
+    return;
+
+  }
+
+
+  /* DELETE IMAGE */
+
+  const imageUrl =
+    image ||
+    receipt.image_url ||
+    "";
+
+
+  if(imageUrl){
+
+    try{
+
+      const marker =
+        "/storage/v1/object/public/receipts/";
+
+
+      const index =
+        imageUrl.indexOf(
+          marker
+        );
+
+
+      if(index !== -1){
+
+        const filePath =
+          decodeURIComponent(
+            imageUrl.substring(
+              index +
+              marker.length
+            )
+          );
+
+
+        if(filePath){
+
+          const {
+            error:storageError
+          } =
+          await supabaseClient
+          .storage
+          .from("receipts")
+          .remove([
+            filePath
+          ]);
+
+
+          if(storageError){
+
+            console.log(
+              "Storage delete error:",
+              storageError.message
+            );
+
+          }
+
+        }
+
+      }
+
+    }catch(error){
+
+      console.log(
+        "Image delete error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  /* RELEASE PENDING */
+
+  for(
+    const ticket of ticketList
+  ){
+
+    const {
+      error:numberError
+    } =
+    await supabaseClient
+    .from("numbers")
+    .update({
+
+      status:
+        "available",
+
+      pending_until:
+        null
+
+    })
+    .eq(
+      "number",
+      ticket
+    )
+    .eq(
+      "status",
+      "pending"
+    );
+
+
+    if(numberError){
+
+      console.log(
+        "Number release error:",
+        ticket,
+        numberError.message
+      );
+
+    }
+
+  }
+
+
+  alert(
+    "✅ Receipt haqameera."
+  );
+
+
+  await loadReceipts();
+
+}
+
+
+
+/* =====================================================
+   DELETE SELECTED RECEIPTS
+===================================================== */
+
+async function deleteSelectedReceipts(){
+
+  const selected =
+    [
+      ...document.querySelectorAll(
+        ".receipt-select:checked"
+      )
+    ]
+    .map(
+      checkbox =>
+        checkbox.value
+    );
+
+
+  if(
+    selected.length === 0
+  ){
+
+    alert(
+      "⚠️ Receipt yoo xiqqaate tokko Select godhi."
+    );
+
+    return;
+
+  }
+
+
+  const ok =
+    confirm(
+
+      "🗑️ Receipt " +
+      selected.length +
+      " filatame haqamuu akka barbaaddu mirkaneessi?"
+
+    );
+
+
+  if(!ok) return;
+
+
+  let deletedCount =
+    0;
+
+
+  let failedCount =
+    0;
+
+
+  for(
+    const id of selected
+  ){
+
+    /* GET RECEIPT */
+
+    const {
+      data:receipt,
+      error:fetchError
+    } =
+    await supabaseClient
+    .from("receipts")
+    .select(
+      "id,number,ticket_numbers,status,image_url"
+    )
+    .eq(
+      "id",
+      id
+    )
+    .maybeSingle();
+
+
+    if(
+      fetchError ||
+      !receipt
+    ){
+
+      console.log(
+        "Receipt fetch error:",
+        fetchError
+      );
+
+      failedCount++;
+
+      continue;
+
+    }
+
+
+    const ticketList =
+      getTicketList(
+        receipt
+      );
+
+
+    /* DELETE RECEIPT */
+
+    const {
+      error:deleteError
+    } =
+    await supabaseClient
+    .from("receipts")
+    .delete()
+    .eq(
+      "id",
+      id
+    );
+
+
+    if(deleteError){
+
+      console.log(
+        "Delete receipt error:",
+        deleteError.message
+      );
+
+      failedCount++;
+
+      continue;
+
+    }
+
+
+    /* DELETE IMAGE */
+
+    const imageUrl =
+      receipt.image_url ||
+      "";
+
+
+    if(imageUrl){
+
+      try{
+
+        const marker =
+          "/storage/v1/object/public/receipts/";
+
+
+        const index =
+          imageUrl.indexOf(
+            marker
+          );
+
+
+        if(index !== -1){
+
+          const filePath =
+            decodeURIComponent(
+              imageUrl.substring(
+                index +
+                marker.length
+              )
+            );
+
+
+          if(filePath){
+
+            const {
+              error:storageError
+            } =
+            await supabaseClient
+            .storage
+            .from("receipts")
+            .remove([
+              filePath
+            ]);
+
+
+            if(storageError){
+
+              console.log(
+                "Storage image delete error:",
+                storageError.message
+              );
+
+            }
+
+          }
+
+        }
+
+      }catch(error){
+
+        console.log(
+          "Image delete error:",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* RELEASE NUMBERS */
+
+    for(
+      const ticket of ticketList
+    ){
+
+      const {
+        error:numberError
+      } =
+      await supabaseClient
+      .from("numbers")
+      .update({
+
+        status:
+          "available",
+
+        pending_until:
+          null
+
+      })
+      .eq(
+        "number",
+        ticket
+      )
+      .eq(
+        "status",
+        "pending"
+      );
+
+
+      if(numberError){
+
+        console.log(
+          "Number release error:",
+          ticket,
+          numberError.message
+        );
+
+      }
+
+    }
+
+
+    deletedCount++;
+
+  }
+
+
+  await releaseExpiredNumbers();
+
+
+  await loadReceipts();
+
+
+  if(
+    failedCount === 0
+  ){
+
+    alert(
+      "✅ Receipt " +
+      deletedCount +
+      " haqameera."
+    );
+
+  }else{
+
+    alert(
+      "⚠️ Delete xumurame.\n\n" +
+
+      "✅ Deleted: " +
+      deletedCount +
+
+      "\n❌ Failed: " +
+      failedCount
+    );
+
+  }
+
+}
+
+
+
+/* =====================================================
+   RELEASE EXPIRED NUMBERS
+===================================================== */
+
+async function releaseExpiredNumbers(){
+
+  const now =
+    new Date()
+    .toISOString();
+
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+  .from("numbers")
+  .select(
+    "id,number,pending_until"
+  )
+  .eq(
+    "status",
+    "pending"
+  )
+  .not(
+    "pending_until",
+    "is",
+    null
+  )
+  .lt(
+    "pending_until",
+    now
+  );
+
+
+  if(error){
+
+    console.log(
+      "Release expired error:",
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !data ||
+    data.length === 0
+  ){
+
+    return;
+
+  }
+
+
+  for(
+    const item of data
+  ){
+
+    const {
+      error:updateError
+    } =
+    await supabaseClient
+    .from("numbers")
+    .update({
+
+      status:
+        "available",
+
+      pending_until:
+        null
+
+    })
+    .eq(
+      "id",
+      item.id
+    )
+    .eq(
+      "status",
+      "pending"
+    );
+
+
+    if(updateError){
+
+      console.log(
+        "Expired number update error:",
+        item.number,
+        updateError.message
+      );
+
+    }
+
+  }
+
+
+  console.log(
+    "✅ Expired numbers released:",
+    data.length
+  );
+
+}
+
+
+
+/* =====================================================
+   DRAW ROUND
+===================================================== */
+
+async function finishRound(){
+
+  const ok =
+    confirm(
+      "🏆 Draw Winner gochuu barbaaddaa?"
+    );
+
+
+  if(!ok) return;
+
+
+  /* ACTIVE ROUND */
+
+  const round =
+    await getActiveRound();
+
+
+  if(!round){
+
+    alert(
+      "❌ Active round hin jiru."
+    );
+
+    return;
+
+  }
+
+
+  /* COUNT 100 */
+
+  const {
+    count,
+    error:countError
+  } =
+  await supabaseClient
+  .from("numbers")
+  .select(
+    "*",
+    {
+      count:"exact",
+      head:true
+    }
+  )
+  .eq(
+    "status",
+    "confirmed"
+  )
+  .eq(
+    "round_id",
+    round.id
+  );
+
+
+  if(countError){
+
+    alert(
+      "❌ Count error:\n\n" +
+      countError.message
+    );
+
+    return;
+
+  }
+
+
+  if(count !== 100){
+
+    alert(
+
+      "⛔ Draw hin danda'amu.\n\n" +
+
+      "Confirmed: " +
+      (count || 0) +
+      "/100"
+
+    );
+
+    return;
+
+  }
+
+
+  /* GET 100 NUMBERS */
+
+  const {
+    data:numbers,
+    error:numberError
+  } =
+  await supabaseClient
+  .from("numbers")
+  .select(
+    "number,owner_name"
+  )
+  .eq(
+    "status",
+    "confirmed"
+  )
+  .eq(
+    "round_id",
+    round.id
+  );
+
+
+  if(
+    numberError ||
+    !numbers ||
+    numbers.length !== 100
+  ){
+
+    alert(
+      "❌ Numbers 100 argachuu hin dandeenye."
+    );
+
+    return;
+
+  }
+
+
+  /* RANDOM SHUFFLE */
+
+  for(
+    let i =
+      numbers.length - 1;
+    i > 0;
+    i--
+  ){
+
+    const j =
+      Math.floor(
+        Math.random() *
+        (i + 1)
+      );
+
+
+    [
+      numbers[i],
+      numbers[j]
+    ] =
+    [
+      numbers[j],
+      numbers[i]
+    ];
+
+  }
+
+
+  /* WINNERS */
+
+  const winners = [
+
+    {
+      position:1,
+
+      number:
+        numbers[0].number,
+
+      prize:10000,
+
+      name:
+        numbers[0].owner_name ||
+        null
+
+    },
+
+    {
+      position:2,
+
+      number:
+        numbers[1].number,
+
+      prize:2000,
+
+      name:
+        numbers[1].owner_name ||
+        null
+
+    },
+
+    {
+      position:3,
+
+      number:
+        numbers[2].number,
+
+      prize:1000,
+
+      name:
+        numbers[2].owner_name ||
+        null
+
+    }
+
+  ];
+
+
+  /* SAVE WINNER HISTORY */
+
+  for(
+    const w of winners
+  ){
+
+    let winnerPhone =
+      null;
+
+
+    const {
+      data:receipts,
+      error:receiptError
+    } =
+    await supabaseClient
+    .from("receipts")
+    .select(
+      "user_name,phone,number,ticket_numbers,status,created_at"
+    )
+    .eq(
+      "status",
+      "approved"
+    )
+    .order(
+      "created_at",
+      {
+        ascending:true
+      }
+    );
+
+
+    if(
+      !receiptError &&
+      receipts
+    ){
+
+      const winnerReceipt =
+        receipts.find(
+          r => {
+
+            const list =
+              getTicketList(
+                r
+              );
+
+            return list.includes(
+              Number(
+                w.number
+              )
+            );
+
+          }
+        );
+
+
+      if(winnerReceipt){
+
+        winnerPhone =
+          winnerReceipt.phone ||
+          null;
+
+      }
+
+    }
+
+
+    const {
+      error:historyError
+    } =
+    await supabaseClient
+    .from("winner_history")
+    .insert({
+
+      round_id:
+        round.id,
+
+      round_number:
+        round.round_number,
+
+      winner_number:
+        w.number,
+
+      winner_position:
+        w.position,
+
+      prize:
+        w.prize,
+
+      winner_name:
+        w.name,
+
+      winner_phone:
+        winnerPhone
+
+    });
+
+
+    if(historyError){
+
+      alert(
+        "❌ Winner history save hin taane.\n\n" +
+        historyError.message
+      );
+
+      console.log(
+        historyError
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  /* FINISH OLD ROUND */
+
+  const {
+    error:finishError
+  } =
+  await supabaseClient
+  .from("rounds")
+  .update({
+
+    status:
+      "finished",
+
+    winner_number:
+      winners[0].number,
+
+    finished_at:
+      new Date().toISOString()
+
+  })
+  .eq(
+    "id",
+    round.id
+  );
+
+
+  if(finishError){
+
+    alert(
+      "❌ Round finish hin taane.\n\n" +
+      finishError.message
+    );
+
+    return;
+
+  }
+
+
+  /* CREATE NEW ROUND */
+
+  const {
+    data:newRound,
+    error:newRoundError
+  } =
+  await supabaseClient
+  .from("rounds")
+  .insert({
+
+    round_number:
+      Number(
+        round.round_number
+      ) + 1,
+
+    status:
+      "active"
+
+  })
+  .select()
+  .single();
+
+
+  if(
+    newRoundError ||
+    !newRound
+  ){
+
+    alert(
+      "⚠️ Round haaraa uumuu hin dandeenye.\n\n" +
+      (
+        newRoundError?.message ||
+        ""
+      )
+    );
+
+    return;
+
+  }
+
+
+  /* RESET NUMBERS */
+
+  const {
+    error:resetError
+  } =
+  await supabaseClient
+  .from("numbers")
+  .update({
+
+    round_id:
+      newRound.id,
+
+    status:
+      "available",
+
+    pending_until:
+      null,
+
+    owner_name:
+      null
+
+  })
+  .eq(
+    "round_id",
+    round.id
+  );
+
+
+  if(resetError){
+
+    alert(
+      "⚠️ Round haaraan uumameera, garuu numbers reset hin taane.\n\n" +
+      resetError.message
+    );
+
+    console.log(
+      resetError
+    );
+
+    return;
+
+  }
+
+
+  /* SHOW WINNERS */
+
+  const winnerBox =
+    document.getElementById(
+      "winnerBox"
+    );
+
+
+  winnerBox.style.display =
+    "block";
+
+
+  winnerBox.innerHTML = `
+
+    <h2>🏆 DRAW RESULT</h2>
+
+
+    <div class="winner-row">
+
+      🥇 1st
+
+      — Number
+      ${escapeHTML(
+        winners[0].number
+      )}
+
+      ${
+        winners[0].name
+        ?
+        " — " +
+        escapeHTML(
+          winners[0].name
+        )
+        :
+        ""
+      }
+
+      — 10,000 Birr
+
+    </div>
+
+
+    <div class="winner-row">
+
+      🥈 2nd
+
+      — Number
+      ${escapeHTML(
+        winners[1].number
+      )}
+
+      ${
+        winners[1].name
+        ?
+        " — " +
+        escapeHTML(
+          winners[1].name
+        )
+        :
+        ""
+      }
+
+      — 2,000 Birr
+
+    </div>
+
+
+    <div class="winner-row">
+
+      🥉 3rd
+
+      — Number
+      ${escapeHTML(
+        winners[2].number
+      )}
+
+      ${
+        winners[2].name
+        ?
+        " — " +
+        escapeHTML(
+          winners[2].name
+        )
+        :
+        ""
+      }
+
+      — 1,000 Birr
+
+    </div>
+
+  `;
+
+
+  alert(
+
+    "🏆 Draw xumurameera!\n\n" +
+
+    "🥇 " +
+    winners[0].number +
+    " = 10,000 Birr\n" +
+
+    "🥈 " +
+    winners[1].number +
+    " = 2,000 Birr\n" +
+
+    "🥉 " +
+    winners[2].number +
+    " = 1,000 Birr"
+
+  );
+
+
+  await loadReceipts();
+
+}
+
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHTML(value){
+
+  if(
+    value === null ||
+    value === undefined
+  ){
+
+    return "";
+
+  }
+
+
+  return String(value)
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+
+/* =====================================================
+   ESCAPE JS
+===================================================== */
+
+function escapeJS(value){
+
+  if(
+    value === null ||
+    value === undefined
+  ){
+
+    return "";
+
+  }
+
+
+  return String(value)
+
+    .replace(
+      /\\/g,
+      "\\\\"
+    )
+
+    .replace(
+      /'/g,
+      "\\'"
+    )
+
+    .replace(
+      /\r/g,
+      "\\r"
+    )
+
+    .replace(
+      /\n/g,
+      "\\n"
+    );
+
+}
+
+
+
+/* =====================================================
+   START
+===================================================== */
+
+loadReceipts();
+
+
+setInterval(
+  loadReceipts,
+  30000
+);
+
+
+setInterval(
+  releaseExpiredNumbers,
+  30000
+);
+
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,1416 @@
+ <!DOCTYPE html>
+<html lang="om">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Aanni Online Lottery</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+ box-sizing:border-box;
+}
+
+body{
+ margin:0;
+ padding:20px 12px 40px;
+ min-height:100vh;
+ font-family:Arial,sans-serif;
+ text-align:center;
+ background:linear-gradient(135deg,#6a11cb,#2575fc);
+ color:white;
+}
+
+h1{
+ font-size:30px;
+ margin:15px 0 25px;
+}
+
+.card{
+ background:white;
+ color:#111;
+ max-width:600px;
+ margin:auto;
+ padding:25px 15px;
+ border-radius:24px;
+ box-shadow:0 0 25px #0005;
+}
+
+/* ===============================
+   PROMO
+=============================== */
+
+.promo{
+ width:100%;
+ max-width:600px;
+ margin:0 auto 15px;
+ text-align:center;
+}
+
+.promo img{
+ width:100%;
+ max-width:600px;
+ height:auto;
+ display:block;
+ border-radius:18px;
+}
+
+/* ===============================
+   ROUND
+=============================== */
+
+.round-info{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:12px;
+ margin:15px 0 20px;
+}
+
+.round-box{
+ background:#eef6ff;
+ border-radius:16px;
+ padding:15px;
+}
+
+.round-box span{
+ display:block;
+ color:#666;
+ font-size:13px;
+}
+
+.round-box strong{
+ color:#1769ff;
+ font-size:20px;
+}
+
+/* ===============================
+   NUMBERS
+=============================== */
+
+#numbers{
+ display:grid;
+ grid-template-columns:repeat(5,1fr);
+ gap:10px;
+}
+
+.number{
+ min-height:58px;
+ border:0;
+ border-radius:14px;
+ background:#00c853;
+ color:white;
+ font-size:19px;
+ font-weight:bold;
+ cursor:pointer;
+ padding:5px;
+}
+
+.number.selected{
+ background:#2196f3;
+}
+
+.number.pending{
+ background:#ff9800;
+ cursor:not-allowed;
+}
+
+.number.confirmed{
+ background:#777;
+ cursor:not-allowed;
+}
+
+.owner-name{
+ display:block;
+ font-size:11px;
+ margin-top:3px;
+ font-weight:normal;
+}
+
+/* ===============================
+   POPUP
+=============================== */
+
+.popup{
+ display:none;
+ position:fixed;
+ inset:0;
+ background:#000b;
+ z-index:9999;
+ align-items:center;
+ justify-content:center;
+ padding:15px;
+ overflow-y:auto;
+}
+
+.box{
+ background:white;
+ color:#111;
+ width:100%;
+ max-width:420px;
+ border-radius:22px;
+ padding:25px;
+ max-height:95vh;
+ overflow-y:auto;
+}
+
+input{
+ width:100%;
+ padding:14px;
+ margin:7px 0;
+ border-radius:12px;
+ border:1px solid #ccc;
+ font-size:16px;
+}
+
+/* ===============================
+   PAYMENT
+=============================== */
+
+.payment-info{
+ margin:15px 0;
+ padding:15px;
+ background:#f1f7ff;
+ border-radius:15px;
+ color:#111;
+}
+
+.bank-row{
+ display:flex;
+ align-items:center;
+ gap:8px;
+ margin:10px 0;
+}
+
+.bank-row span{
+ font-weight:bold;
+ min-width:55px;
+ text-align:left;
+}
+
+.bank-row strong{
+ flex:1;
+ font-size:15px;
+ text-align:left;
+ word-break:break-all;
+}
+
+.bank-row button{
+ border:0;
+ background:#1769ff;
+ color:white;
+ padding:8px 10px;
+ border-radius:8px;
+ cursor:pointer;
+ font-size:13px;
+}
+
+.send-note{
+ margin-top:15px;
+ padding-top:12px;
+ border-top:1px solid #ccc;
+ color:#1769ff;
+ font-size:16px;
+}
+
+/* ===============================
+   BUTTON
+=============================== */
+
+.btn{
+ width:100%;
+ padding:14px;
+ border:0;
+ border-radius:14px;
+ background:#00c853;
+ color:white;
+ font-size:17px;
+ font-weight:bold;
+ cursor:pointer;
+}
+
+.btn:disabled{
+ opacity:.6;
+ cursor:not-allowed;
+}
+
+.close{
+ margin-top:12px;
+ padding:12px 25px;
+ border:0;
+ border-radius:12px;
+ cursor:pointer;
+ background:#eee;
+}
+
+/* ===============================
+   MOBILE
+=============================== */
+
+@media(max-width:400px){
+
+ #numbers{
+   grid-template-columns:repeat(5,1fr);
+   gap:7px;
+ }
+
+ .number{
+   min-height:52px;
+   font-size:16px;
+ }
+
+ .owner-name{
+   font-size:9px;
+ }
+
+ .box{
+   padding:18px;
+ }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<h1>
+🎟️ Aanni Online Lottery
+</h1>
+
+
+<!-- PROMO -->
+
+<div class="promo">
+
+  <img
+    src="https://iwoplidjsadmgavegwws.supabase.co/storage/v1/object/public/Promo/logo.png"
+    alt="Aanni Online Lottery"
+    class="promo-logo"
+  >
+
+</div>
+
+
+<div class="card">
+
+
+<h2>
+Number filadhu
+</h2>
+
+
+<div class="round-info">
+
+
+<div class="round-box">
+
+<span>
+🎯 Current Round
+</span>
+
+<strong id="roundNumber">
+Round -
+</strong>
+
+</div>
+
+
+<div class="round-box">
+
+<span>
+🎟️ Confirmed
+</span>
+
+<strong id="confirmedCount">
+0 / 100
+</strong>
+
+</div>
+
+
+</div>
+
+
+<div id="numbers"></div>
+
+
+</div>
+
+
+<!-- ===============================
+     POPUP
+=============================== -->
+
+<div class="popup" id="popup">
+
+
+<div class="box">
+
+
+<h2>
+🎟 Ticket:
+<span id="selectedNumber"></span>
+</h2>
+
+
+<h3 id="price">
+💰 Gatii: 0 Birr
+</h3>
+
+
+<!-- ===============================
+     PAYMENT ACCOUNT
+=============================== -->
+
+<div class="payment-info">
+
+
+<div class="bank-row">
+
+<span>
+CBE
+</span>
+
+<strong>
+1000323550828
+</strong>
+
+<button
+ type="button"
+ onclick="copyAccount('1000323550828')"
+>
+📋 Copy
+</button>
+
+</div>
+
+
+<div class="bank-row">
+
+<span>
+Awash
+</span>
+
+<strong>
+013201800201700
+</strong>
+
+<button
+ type="button"
+ onclick="copyAccount('013201800201700')"
+>
+📋 Copy
+</button>
+
+</div>
+
+
+<div class="send-note">
+
+<strong>
+ANENE MELKAMU
+</strong>
+
+</div>
+
+
+</div>
+
+
+<input
+ id="name"
+ placeholder="Maqaa kee"
+>
+
+
+<input
+ id="phone"
+ placeholder="Phone number"
+>
+
+
+<input
+ type="file"
+ id="receipt"
+ accept="image/*"
+>
+
+
+<button
+ class="btn"
+ id="sendBtn"
+ onclick="sendReceipt()"
+>
+
+🧾 Receipt Ergi
+
+</button>
+
+
+<button
+ class="close"
+ onclick="closePopup()"
+>
+
+Cufi
+
+</button>
+
+
+<p id="message"></p>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+
+/* ===============================
+   SUPABASE
+=============================== */
+
+const SUPABASE_URL =
+"https://iwoplidjsadmgavegwws.supabase.co";
+
+
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3b3BsaWRqc2FkbWdhdmVnd3dzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNjQ2ODQsImV4cCI6MjEwMzk0MDY4NH0.Z8hfxoz6jSVikzm94g7ihpTn5HlPUqRFLPJcr2HS7RE";
+
+
+const supabaseClient =
+supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
+
+
+/* ===============================
+   SETTINGS
+=============================== */
+
+const MAX_TICKETS = 5;
+
+const TICKET_PRICE = 200;
+
+const numbersBox =
+document.getElementById("numbers");
+
+let selectedNumbers = [];
+
+
+/* ===============================
+   CREATE NUMBERS
+=============================== */
+
+function createNumbers(){
+
+ numbersBox.innerHTML = "";
+
+ for(let i=1;i<=100;i++){
+
+   const btn =
+   document.createElement("button");
+
+   btn.className = "number";
+
+   btn.id = "number-" + i;
+
+   btn.innerText = i;
+
+   btn.onclick =
+   () => selectNumber(i);
+
+   numbersBox.appendChild(btn);
+
+ }
+
+}
+
+
+/* ===============================
+   SELECT NUMBER
+=============================== */
+
+async function selectNumber(number){
+
+ const {
+   data,
+   error
+ } =
+ await supabaseClient
+ .from("numbers")
+ .select("number,status")
+ .eq("number",number)
+ .single();
+
+
+ if(error){
+
+   alert(
+     "❌ Number hin argamne."
+   );
+
+   return;
+
+ }
+
+
+ if(data.status !== "available"){
+
+   alert(
+     "⛔ Number kun hin jiru."
+   );
+
+   return;
+
+ }
+
+
+ /* REMOVE IF ALREADY SELECTED */
+
+ if(
+   selectedNumbers.includes(number)
+ ){
+
+   selectedNumbers =
+   selectedNumbers.filter(
+     n => n !== number
+   );
+
+ }
+
+ else{
+
+   if(
+     selectedNumbers.length >= MAX_TICKETS
+   ){
+
+     alert(
+       "⚠️ Ticket 5 caalaa filachuu hin dandeessu."
+     );
+
+     return;
+
+   }
+
+   selectedNumbers.push(number);
+
+ }
+
+
+ updateSelectedUI();
+
+
+ if(
+   selectedNumbers.length > 0
+ ){
+
+   document.getElementById(
+     "popup"
+   ).style.display = "flex";
+
+ }
+
+ else{
+
+   document.getElementById(
+     "popup"
+   ).style.display = "none";
+
+ }
+
+}
+
+
+/* ===============================
+   UPDATE SELECTED UI
+=============================== */
+
+function updateSelectedUI(){
+
+ document.getElementById(
+   "selectedNumber"
+ ).innerText =
+ selectedNumbers.join(", ");
+
+
+ document.getElementById(
+   "price"
+ ).innerText =
+ "💰 Gatii: " +
+ (
+   selectedNumbers.length *
+   TICKET_PRICE
+ ) +
+ " Birr";
+
+
+ document.querySelectorAll(
+   ".number"
+ ).forEach(btn => {
+
+   btn.classList.remove(
+     "selected"
+   );
+
+ });
+
+
+ selectedNumbers.forEach(n => {
+
+   const btn =
+   document.getElementById(
+     "number-" + n
+   );
+
+   if(btn){
+
+     btn.classList.add(
+       "selected"
+     );
+
+   }
+
+ });
+
+}
+
+
+/* ===============================
+   COPY ACCOUNT
+=============================== */
+
+function copyAccount(account){
+
+ const textarea =
+ document.createElement("textarea");
+
+ textarea.value = account;
+
+ textarea.style.position = "fixed";
+
+ textarea.style.opacity = "0";
+
+ document.body.appendChild(
+   textarea
+ );
+
+ textarea.select();
+
+ document.execCommand("copy");
+
+ document.body.removeChild(
+   textarea
+ );
+
+ alert(
+   "✅ Account number copy godhame."
+ );
+
+}
+
+
+/* ===============================
+   SEND RECEIPT
+=============================== */
+
+async function sendReceipt(){
+
+ if(
+   selectedNumbers.length === 0
+ ){
+
+   alert(
+     "Dura ticket filadhu."
+   );
+
+   return;
+
+ }
+
+
+ const name =
+ document.getElementById(
+   "name"
+ ).value.trim();
+
+
+ const phone =
+ document.getElementById(
+   "phone"
+ ).value.trim();
+
+
+ const file =
+ document.getElementById(
+   "receipt"
+ ).files[0];
+
+
+ if(
+   !name ||
+   !phone ||
+   !file
+ ){
+
+   alert(
+     "Maqaa, phone fi receipt guuti."
+   );
+
+   return;
+
+ }
+
+
+ const sendBtn =
+ document.getElementById(
+   "sendBtn"
+ );
+
+
+ sendBtn.disabled = true;
+
+ sendBtn.innerText =
+ "⏳ Ergaa jira...";
+
+
+ try{
+
+
+   /* ===============================
+      CHECK ACTIVE ROUND
+   =============================== */
+
+   const {
+     data:activeRound,
+     error:roundError
+   } =
+   await supabaseClient
+   .from("rounds")
+   .select("*")
+   .eq("status","active")
+   .order(
+     "created_at",
+     {ascending:false}
+   )
+   .limit(1)
+   .maybeSingle();
+
+
+   if(roundError){
+
+     throw roundError;
+
+   }
+
+
+   if(!activeRound){
+
+     throw new Error(
+       "Active round hin jiru."
+     );
+
+   }
+
+
+   /* ===============================
+      CHECK SELECTED NUMBERS
+   =============================== */
+
+   const {
+     data:checkNumbers,
+     error:checkError
+   } =
+   await supabaseClient
+   .from("numbers")
+   .select(
+     "number,status,round_id"
+   )
+   .in(
+     "number",
+     selectedNumbers
+   );
+
+
+   if(checkError){
+
+     throw checkError;
+
+   }
+
+
+   for(
+     const ticket of selectedNumbers
+   ){
+
+     const row =
+     checkNumbers.find(
+       n => n.number === ticket
+     );
+
+
+     if(
+       !row ||
+       row.status !== "available" ||
+       row.round_id !== activeRound.id
+     ){
+
+       throw new Error(
+         "Number " +
+         ticket +
+         " amma available miti."
+       );
+
+     }
+
+   }
+
+
+   /* ===============================
+      FILE NAME
+   =============================== */
+
+   const fileName =
+   Date.now()
+   +
+   "_"
+   +
+   file.name.replace(
+     /[^a-zA-Z0-9._-]/g,
+     "_"
+   );
+
+
+   /* ===============================
+      UPLOAD RECEIPT
+   =============================== */
+
+   const {
+     error:uploadError
+   } =
+   await supabaseClient
+   .storage
+   .from("receipts")
+   .upload(
+     fileName,
+     file
+   );
+
+
+   if(uploadError){
+
+     throw uploadError;
+
+   }
+
+
+   /* ===============================
+      10 MIN PENDING
+   =============================== */
+
+   const pendingUntil =
+   new Date(
+     Date.now()
+     +
+     10 * 60 * 1000
+   ).toISOString();
+
+
+   /* ===============================
+      NUMBER PENDING
+   =============================== */
+
+   const {
+     error:numberError
+   } =
+   await supabaseClient
+   .from("numbers")
+   .update({
+
+     status:"pending",
+
+     pending_until:
+     pendingUntil
+
+   })
+   .in(
+     "number",
+     selectedNumbers
+   )
+   .eq(
+     "round_id",
+     activeRound.id
+   )
+   .eq(
+     "status",
+     "available"
+   );
+
+
+   if(numberError){
+
+     throw numberError;
+
+   }
+
+
+   /* ===============================
+      SAVE RECEIPT
+   =============================== */
+
+   const {
+     error:receiptError
+   } =
+   await supabaseClient
+   .from("receipts")
+   .insert({
+
+     user_name:
+     name,
+
+     phone:
+     phone,
+
+     number:
+     selectedNumbers[0],
+
+     ticket_numbers:
+     selectedNumbers.join(","),
+
+     image_url:
+     fileName,
+
+     status:
+     "pending"
+
+   });
+
+
+   if(receiptError){
+
+     throw receiptError;
+
+   }
+
+
+   /* ===============================
+      SUCCESS
+   =============================== */
+
+   alert(
+     "✅ Receipt ergameera.\n\n" +
+
+     "🎟 Ticket: " +
+     selectedNumbers.join(", ") +
+
+     "\n💰 Kaffaltii: " +
+
+     (
+       selectedNumbers.length *
+       TICKET_PRICE
+     ) +
+
+     " Birr\n\n" +
+
+     "Admin mirkaneessa eegi."
+   );
+
+
+   selectedNumbers = [];
+
+
+   document.getElementById(
+     "name"
+   ).value = "";
+
+
+   document.getElementById(
+     "phone"
+   ).value = "";
+
+
+   document.getElementById(
+     "receipt"
+   ).value = "";
+
+
+   updateSelectedUI();
+
+   closePopup();
+
+   loadStatuses();
+
+   loadRound();
+
+
+ }
+ catch(error){
+
+   alert(
+     "❌ Rakkoo:\n" +
+     error.message
+   );
+
+   console.log(error);
+
+ }
+ finally{
+
+   sendBtn.disabled = false;
+
+   sendBtn.innerText =
+   "🧾 Receipt Ergi";
+
+ }
+
+}
+
+
+/* ===============================
+   CLOSE POPUP
+=============================== */
+
+function closePopup(){
+
+ document.getElementById(
+   "popup"
+ ).style.display =
+ "none";
+
+}
+
+
+/* ===============================
+   LOAD NUMBER STATUS
+=============================== */
+
+async function loadStatuses(){
+
+ const {
+   data,
+   error
+ } =
+ await supabaseClient
+ .from("numbers")
+ .select(
+   "number,status,owner_name,pending_until,round_id"
+ );
+
+
+ if(error){
+
+   console.log(
+     "Status load error:",
+     error.message
+   );
+
+   return;
+
+ }
+
+
+ data.forEach(item => {
+
+   const btn =
+   document.getElementById(
+     "number-" + item.number
+   );
+
+
+   if(!btn) return;
+
+
+   btn.classList.remove(
+     "pending",
+     "confirmed",
+     "selected"
+   );
+
+
+   btn.innerHTML =
+   item.number;
+
+
+   if(
+     item.status === "pending"
+   ){
+
+     btn.classList.add(
+       "pending"
+     );
+
+     btn.disabled = true;
+
+   }
+
+
+   else if(
+     item.status === "confirmed"
+   ){
+
+     btn.classList.add(
+       "confirmed"
+     );
+
+     btn.disabled = true;
+
+
+     if(
+       item.owner_name &&
+       item.owner_name.trim() !== ""
+     ){
+
+       const owner =
+       document.createElement(
+         "span"
+       );
+
+       owner.className =
+       "owner-name";
+
+       owner.innerText =
+       item.owner_name;
+
+       btn.appendChild(
+         owner
+       );
+
+     }
+
+   }
+
+
+   else{
+
+     btn.disabled = false;
+
+   }
+
+ });
+
+
+}
+
+
+/* ===============================
+   RELEASE EXPIRED
+=============================== */
+
+async function releaseExpiredNumbers(){
+
+ const now =
+ new Date().toISOString();
+
+
+ const {
+   data,
+   error
+ } =
+ await supabaseClient
+ .from("numbers")
+ .select(
+   "number,status,pending_until"
+ )
+ .eq(
+   "status",
+   "pending"
+ );
+
+
+ if(error){
+
+   console.log(error);
+
+   return;
+
+ }
+
+
+ for(
+   const item of data
+ ){
+
+   if(
+     item.pending_until &&
+     item.pending_until < now
+   ){
+
+     await supabaseClient
+     .from("numbers")
+     .update({
+
+       status:"available",
+
+       pending_until:null
+
+     })
+     .eq(
+       "number",
+       item.number
+     )
+     .eq(
+       "status",
+       "pending"
+     );
+
+   }
+
+ }
+
+
+ loadStatuses();
+
+}
+
+
+/* ===============================
+   LOAD ROUND
+=============================== */
+
+async function loadRound(){
+
+ const {
+   data:round,
+   error
+ } =
+ await supabaseClient
+ .from("rounds")
+ .select("*")
+ .eq(
+   "status",
+   "active"
+ )
+ .order(
+   "created_at",
+   {ascending:false}
+ )
+ .limit(1)
+ .maybeSingle();
+
+
+ if(error){
+
+   console.log(
+     "Round error:",
+     error.message
+   );
+
+   return;
+
+ }
+
+
+ if(!round){
+
+   document.getElementById(
+     "roundNumber"
+   ).innerText =
+   "Round -";
+
+   return;
+
+ }
+
+
+ document.getElementById(
+   "roundNumber"
+ ).innerText =
+ "Round " +
+ round.round_number;
+
+
+ const {
+   count,
+   error:countError
+ } =
+ await supabaseClient
+ .from("numbers")
+ .select(
+   "*",
+   {
+     count:"exact",
+     head:true
+   }
+ )
+ .eq(
+   "round_id",
+   round.id
+ )
+ .eq(
+   "status",
+   "confirmed"
+ );
+
+
+ if(countError){
+
+   console.log(
+     countError.message
+   );
+
+   return;
+
+ }
+
+
+ document.getElementById(
+   "confirmedCount"
+ ).innerText =
+ (count || 0) +
+ " / 100";
+
+}
+
+
+/* ===============================
+   START
+=============================== */
+
+createNumbers();
+
+loadStatuses();
+
+loadRound();
+
+releaseExpiredNumbers();
+
+
+/* ===============================
+   AUTO REFRESH
+=============================== */
+
+setInterval(
+ loadStatuses,
+ 10000
+);
+
+
+setInterval(
+ loadRound,
+ 10000
+);
+
+
+setInterval(
+ releaseExpiredNumbers,
+ 30000
+);
+
+</script>
+
+
+</body>
+
+</html>
