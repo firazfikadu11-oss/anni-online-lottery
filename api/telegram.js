@@ -33,7 +33,7 @@ export default async function handler(req, res) {
             {
               text: "🎟️ Play Lottery",
               web_app: {
-                url: "https://anni-online-lottery-3.vercel.app"
+                url: "https://anni-online-lottery-3-firazfikadu11-5923s-projects.vercel.app"
               }
             }
           ]
